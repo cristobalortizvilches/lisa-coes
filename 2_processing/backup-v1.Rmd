@@ -1,0 +1,56 @@
+---
+title: "Respaldo lisa survey v1"
+author: "Cristóbal Ortiz"
+date: "2023-11-28"
+output: html_document
+---
+
+```{r load-library}
+library(formr)
+library(tidyverse)
+library(writexl)
+library(sjlabelled)
+```
+
+```{r load-dataset}
+remove(list = ls())
+
+formr_connect(email = "cristobalortizvi@gmail.com", password = "lisacoes.2023") #conexión con formr
+lisa_v1 <- formr_results(survey_name = 'lisa_coes_survey') #cargar dataset desde formr (demora)
+save(lisa_v1, file = "../1_input/data/original/lisa_v1.RData") #guardar dataset para cargar local
+
+load("../1_input/data/original/lisa_v1.RData") #cargar dataset local (es más rápido)
+```
+
+```{r data-wrangle}
+#names(lisa_cc)
+
+lisa_v1_b <- lisa_v1 %>% 
+  rowwise() %>%
+  mutate(n_NAs = sum(is.na(across(everything())))) %>%  #generamos una nueva variable que cuenta número de NA
+  filter(n_NAs < 140) #filtramos dejando sólo aquellos que tienen respuestas en comentarios
+```
+
+```{r data-labelled}
+var_lab <- vector("character", nrow(data.frame(names(lisa_cc2))))# creamos un vector de caracteres vacío de longitud 167 (c° de variables)
+for(j in seq_along(lisa_cc2)) { # establecemos secuencia de iteración a lo largo de las variables "i" del dataset
+  var_lab[[j]] <- paste(get_label(lisa_cc2[[j]]), collapse = " | ") # concatenamos valores de cada variable i
+}
+```
+
+```{r traspose}
+lisa_cc_com <- t(lisa_cc2) %>% #trasponer
+  as_tibble(rownames = NA) #convertir en dataframe tibble manteniendo nombre de filas (nombre de variables)
+
+lisa_cc_com <- lisa_cc_com %>% 
+  mutate(var_name = row.names(lisa_cc_com), #nueva columna: nombre de variables
+         var_label = var_lab) %>% #nueva columna: etiqueta de variables
+  select(var_name, var_label, everything()) #reordenamos variables
+```
+
+
+```{r save-dateset}
+save(lisa_cc_com, file = "../1_input/data/procesada/lisa-cc-com.RData")
+write_xlsx(lisa_cc_com,"../1_input/data/procesada/lisa-cc-com.xlsx")
+
+```
