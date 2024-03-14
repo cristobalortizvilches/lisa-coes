@@ -1,0 +1,94 @@
+---
+title: "Respaldo lisa survey v1"
+author: "Cristóbal Ortiz"
+date: "2023-02-01"
+output: html_document
+---
+
+```{r load-library, include=FALSE}
+library(formr)
+library(tidyverse)
+library(writexl)
+library(sjlabelled)
+library(summarytools)
+```
+
+```{r load-dataset, include=FALSE}
+remove(list = ls())
+
+#formr_connect(email = "cristobalortizvi@gmail.com", password = "lisacoes.2023") #conexión con formr
+#lisa_v2 <- formr_results(survey_name = 'lisa_coes_survey') #cargar dataset desde formr (demora)
+#save(lisa_v2, file = "../1_input/data/original/lisa_v2.RData") #guardar dataset para cargar local
+
+load("../1_input/data/original/lisa_v2.RData") #cargar dataset local (es más rápido)
+```
+
+```{r data-wrangle, include=FALSE}
+#names(lisa_cc)
+
+lisa_v2_all <- lisa_v2 %>% 
+  rowwise() %>%
+  mutate(n_NAs = sum(is.na(across(everything())))) #generamos una nueva variable que cuenta número de NA
+
+lisa_v2_75 <- lisa_v2_all %>% 
+  filter(n_NAs < 37) #N=40
+
+lisa_v2_50 <- lisa_v2_all %>% 
+  filter(n_NAs < 72) #N=46
+
+lisa_v2_15 <- lisa_v2_all %>% 
+  filter(n_NAs < 108) #N=65
+```
+
+```{r include=FALSE}
+lisa_v2_visual <- lisa_v2_75 %>% 
+  dplyr::select(-c(session, created, modified, ended, expired)) %>% 
+  as_label()
+
+lisa_summ <- dfSummary(lisa_v2_visual, style = "grid", plain.ascii = FALSE)
+save(lisa_summ, file = "../1_input/data/procesada/lisa_summ.RData")
+load("../1_input/data/procesada/lisa_summ.RData")
+view(lisa_summ)
+
+##
+
+lisa_v2_visual2 <- lisa_v2_75 %>% 
+  dplyr::select(-c(session, created, modified, ended, expired)) %>% 
+  dplyr::select(-where(is.character)) 
+
+lisa_summ2 <- dfSummary(lisa_v2_visual2, style = "grid", plain.ascii = FALSE)
+save(lisa_summ2, file = "../1_input/data/procesada/lisa_summ2.RData")
+load("../1_input/data/procesada/lisa_summ2.RData")
+view(lisa_summ2)
+```
+
+```{r}
+lisa_summ <- lisa_summ %>% 
+  as.data.frame()
+
+lisa_summ2 <- lisa_summ2 %>% 
+  as.data.frame()
+
+#filas a reemplazar
+#2, 7, 9, 13, 16, 19, 20
+#21:28, 56:58, 75, 105, 119:121, 125
+#filas a incorporar
+#2, 5, 7, 10, 12, 14, 15
+#16:23, 51:53, 70, 98, 111:113, 116
+
+lisa_summ_all <- lisa_summ %>%
+  slice(-c(2, 7, 9, 13, 16, 19, 20, 21:28, 56:58, 75, 105, 119:121, 125, 127:138)) %>%
+  bind_rows(lisa_summ2 %>% 
+              slice(c(2, 5, 7, 10, 12, 14, 15, 16:23, 51:53, 70, 98, 111:113, 116))) %>% 
+  arrange(No) 
+
+view(lisa_summ_all)
+```
+
+
+
+```{r save-dateset, eval=FALSE, include=FALSE}
+#save(lisa_cc_com, file = "../1_input/data/procesada/lisa-cc-com.RData")
+#write_xlsx(lisa_cc_com,"../1_input/data/procesada/lisa-cc-com.xlsx")
+
+```
