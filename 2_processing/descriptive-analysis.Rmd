@@ -3,19 +3,21 @@ title: "Descriptivos CAIS Pre-ALAS"
 author: "Cristóbal Ortiz"
 date: "mayo 2024"
 output:
-  pdf_document: default
-  html_document: default
+  html_document:
+    toc: true
+    theme: united
+  pdf_document:
+    toc: true
+    highlight: zenburn
 ---
-```{r setup-markdown,include=FALSE}
-knitr::opts_chunk$set(
-	message = FALSE,
-	warning = FALSE,
-	cache = TRUE
-)
+```{r setup-chunk, include=FALSE} 
+knitr::opts_chunk$set(dev = 'png', dpi = 300, fig.width = 10, fig.height = 6,
+                      message = FALSE, warning = FALSE, echo = FALSE, cache = TRUE)
+#knitr::opts_knit$set(root.dir = "../3_output/img-cais-alas")
 options(scipen=999)
 options(knitr.kable.NA = '')
+getwd()
 ```
-
 ```{r load-library, include=FALSE}
 library(formr)
 library(tidyverse)
@@ -75,12 +77,12 @@ legend = "Fuente CAIS (2024), N = 70."
 cais_test_annos <- cais_v2 %>% 
   select(session, mod01_1, mod08_1)
 
-frq(cais_v2$sexo)
+frq(cais_v2$etapa)
 ```
 
 # Conocimiento en Ciencia Abierta
 
-```{r cca, echo=FALSE}
+```{r 1-cca, echo=FALSE}
 # El siguiente gráfico visualiza una batería, es decir, varios tems con preguntas diferentes, pero iguales valores de respuesta. Este tipo de gráficos sigue la siguiente estructura tipo:
 labels_cca <- c("Concepto Ciencia Abierta", "Acceso abierto a publicaciones", "Preregistro de hipótesis", 
                 "Apertura de datos de investigación", "Investigación reproducible", "Repositorios abiertos", 
@@ -119,7 +121,7 @@ cais_v2 %>%
   coord_flip()
 ```
 
-```{r cca-sexo, echo=FALSE}
+```{r 1-cca-sexo, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(mod02_1, starts_with("mod02_2"))) %>%
   mutate(name = factor(name, labels = labels_cca),
@@ -142,7 +144,7 @@ cais_v2 %>%
   coord_flip()
 ```
 
-```{r cca-edad, echo=FALSE}
+```{r 1-cca-edad, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(mod02_1, starts_with("mod02_2"))) %>%
   mutate(name = factor(name, labels = labels_cca),
@@ -165,7 +167,7 @@ cais_v2 %>%
   coord_flip()
 ```
 
-```{r cca-etapa, echo=FALSE}
+```{r 1-cca-etapa, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(mod02_1, starts_with("mod02_2"))) %>%
   mutate(name = factor(name, labels = labels_cca),
@@ -188,7 +190,7 @@ cais_v2 %>%
   coord_flip()
 ```
 
-```{r cca-grado, echo=FALSE}
+```{r 1-cca-grado, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(mod02_1, starts_with("mod02_2"))) %>%
   mutate(name = factor(name, labels = labels_cca),
@@ -211,7 +213,7 @@ cais_v2 %>%
   coord_flip()
 ```
 
-```{r cca-enfoque, echo=FALSE}
+```{r 1-cca-enfoque, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(mod02_1, starts_with("mod02_2"))) %>%
   mutate(name = factor(name, labels = labels_cca),
@@ -237,7 +239,7 @@ cais_v2 %>%
 
 # Valoración de la Ciencia Abierta
 
-```{r vca, echo=FALSE}
+```{r 2-vca, echo=FALSE}
 labels_valor <- c("Pre-registro de hipótesis", 
                   "Disponibilizar en linea\nlos datos, materiales y\nprotocolos de análisis", 
                   "Reportar resultados aunque\nestos no sean estadísticamente\nsignificativos",
@@ -255,8 +257,8 @@ cais_v2 %>%
   mutate(freq = n/sum(n)) %>%
   ggplot(aes(x = name, y = freq, fill = factor(value, levels = c("No la conoce", "Nada o poco", "Moderadamente", "Bastante o mucho")), 
              label = scales::percent(freq, accuracy = .1))) + 
-  geom_col(position = 'dodge2') + 
-  geom_text(position = position_dodge(width  = .9),  size = 2.5, hjust = -.1) +
+  geom_col(position = 'Stack') + 
+  geom_text(position = position_stack(vjust = .5), size= 2.5, color = 'white') +
   labs(title = '¿Qué tan necesarias cree que son las siguientes medidas\nimpulsadas por la CA para la investigación en Ciencias Sociales?:',
        subtitle = "", caption = legend, x = "", y = "", fill = "") + 
   theme(legend.position = 'right') +
@@ -266,7 +268,7 @@ cais_v2 %>%
   coord_flip()
 ```
 
-```{r vca-sexo, echo=FALSE}
+```{r 2-vca-sexo, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(starts_with("mod02_4_"))) %>%
   mutate(name = factor(name, labels = labels_valor),
@@ -290,7 +292,7 @@ cais_v2 %>%
   coord_flip()
 ```
 
-```{r vca-edad, echo=FALSE}
+```{r 2-vca-edad, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(starts_with("mod02_4_"))) %>%
   mutate(name = factor(name, labels = labels_valor),
@@ -309,12 +311,12 @@ cais_v2 %>%
        subtitle = "Porcentaje que responde 'Bastante o mucho'", caption = legend, x = "", y = "", fill = "Grupo etario") + 
   theme(legend.position = 'right') +
   scale_fill_viridis_d(option = "magma", begin = .1, end = .7, direction = -1) +
-  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1.1)) +
   guides(fill = guide_legend(reverse = TRUE)) +
   coord_flip()
 ```
 
-```{r vca-etapa, echo=FALSE}
+```{r 2-vca-etapa, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(starts_with("mod02_4_"))) %>%
   mutate(name = factor(name, labels = labels_valor),
@@ -333,12 +335,12 @@ cais_v2 %>%
        subtitle = "Porcentaje que responde 'Bastante o mucho'", caption = legend, x = "", y = "", fill = "Etapa de la carrera\nacadémica") + 
   theme(legend.position = 'right') +
   scale_fill_viridis_d(option = "magma", begin = .1, end = .7, direction = -1) +
-  scale_y_continuous(labels = scales::percent, limits = c(0, 1)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0, 1.1)) +
   guides(fill = guide_legend(reverse = TRUE)) +
   coord_flip()
 ```
 
-```{r vca-grado, echo=FALSE}
+```{r 2-vca-grado, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(starts_with("mod02_4_"))) %>%
   mutate(name = factor(name, labels = labels_valor),
@@ -362,7 +364,7 @@ cais_v2 %>%
   coord_flip()
 ```
 
-```{r vca-enfoque, echo=FALSE}
+```{r 2-vca-enfoque, echo=FALSE}
 cais_v2 %>%
   pivot_longer(cols = c(starts_with("mod02_4_"))) %>%
   mutate(name = factor(name, labels = labels_valor),
@@ -389,7 +391,7 @@ cais_v2 %>%
 
 # Prácticas en Ciencia Abierta
 
-```{r prac2, echo=FALSE}
+```{r 3-prac, echo=FALSE}
 labels_comu <- c("Compartir códigos entre\ninvestigadores/as",
                  "Utilizar repositorios abiertos en línea\npara subir información relacionada con\nlas investigaciones",
                  "Reporte selectivo de resultados, es decir,\nsolo aquello que va en concordancia\ncon las hipótesis",
@@ -435,7 +437,7 @@ practicas %>%
   facet_wrap(~ var)
 ```
 
-```{r prac2-sexo, echo=FALSE}
+```{r 3-prac-sexo, echo=FALSE}
 pr_comu <- cais_v2 %>%  
   select(starts_with("mod03_1_"), sexo) %>% pivot_longer(cols = starts_with("mod03_1_")) %>% 
   tibble(var = c(rep("Prácticas de la comunidad"))) %>% 
@@ -472,7 +474,7 @@ practicas_sexo %>%
 
 # Barreras en Ciencia Abierta:
 
-```{r bca-comp, echo=FALSE}
+```{r 4-bca-comp, echo=FALSE}
 
 var_label_barreras <- c("Falta de conocimiento", "Falta de tiempo ", "Falta de incentivos", "Reticencias ante el plagio", "Falta de políticas")
 
@@ -520,7 +522,7 @@ barreras %>%
   facet_wrap(~ var)
 ```
 
-```{r bca-sexo, echo=FALSE, warning=FALSE}
+```{r 4-bca-sexo, echo=FALSE, warning=FALSE}
 
 var_label_barreras <- c("Falta de conocimiento", "Falta de tiempo ", "Falta de incentivos", "Reticencias ante el plagio", "Falta de políticas")
 
@@ -571,7 +573,7 @@ barreras %>%
 
 
 
-```{r prac1, eval=FALSE, include=FALSE}
+```{r prac2, eval=FALSE, include=FALSE}
 cais_v2 %>%
   select(mod02_3) %>% 
   drop_na() %>% 
