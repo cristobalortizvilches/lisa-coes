@@ -19,9 +19,9 @@ library(summarytools)
 remove(list = ls())
 
 load("../1_input/data/original/lisa_v2.RData") #cargar dataset local (es más rápido)
-formr_connect(email = "cristobalortizvi@gmail.com", password = "lisacoes.2023") #conexión con formr
-lisa_v2 <- formr_results(survey_name = 'lisa_coes_survey') #cargar dataset desde formr (demora)
-save(lisa_v2, file = "../1_input/data/original/lisa_v2.RData") #guardar dataset para cargar local
+#formr_connect(email = "cristobalortizvi@gmail.com", password = "lisacoes.2023") #conexión con formr
+#lisa_v2 <- formr_results(survey_name = 'lisa_coes_survey') #cargar dataset desde formr (demora)
+#save(lisa_v2, file = "../1_input/data/original/lisa_v2.RData") #guardar dataset para cargar local
 
 ```
 
@@ -33,13 +33,13 @@ lisa_v2_all <- lisa_v2 %>%
   mutate(n_NAs = sum(is.na(across(everything())))) #generamos una nueva variable que cuenta número de NA
 
 lisa_v2_75 <- lisa_v2_all %>% 
-  filter(n_NAs < 37) #N=40 -> 42 -> 70
+  filter(n_NAs < 37) #N=40 -> 42 -> 70 -> 72
 
 lisa_v2_50 <- lisa_v2_all %>% 
-  filter(n_NAs < 72) #N=46 -> 48 -> 78
+  filter(n_NAs < 72) #N=46 -> 48 -> 78 -> 80
 
 lisa_v2_15 <- lisa_v2_all %>% 
-  filter(n_NAs < 108) #N=65 -> 69 -> 107
+  filter(n_NAs < 108) #N=65 -> 69 -> 107 -> 112
 ```
 
 ```{r echo=FALSE}
@@ -82,8 +82,6 @@ options("tmp.img.dir" = "../3_output/img-summary")
 
 view(lisa_summ_all)
 ```
-
-
 
 ```{r save-dateset, eval=FALSE, include=FALSE}
 #save(lisa_cc_com, file = "../1_input/data/procesada/lisa-cc-com.RData")
